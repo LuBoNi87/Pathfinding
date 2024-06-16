@@ -1,3 +1,30 @@
 .grid {
     margin: 100px 0 0;
+    display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
 }
+
+
+.button-visualize {
+    background-color: #4CAF50; 
+    color: white; 
+    padding: 10px 20px; 
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .button-visualize:hover {
+    background-color: #45a049;
+  }
+  
+  .button-visualize:active {
+    background-color: #3e8e41; 
+    transform: scale(0.97);
+  }
+
+  

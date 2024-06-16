@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import Node from './Node/Node';
 import {dijkstra, getNodesInShortestPathOrder} from '../algorithms/dijkstra';
+import './Navbar.css'; // Import the Navbar.css file for styling
+import Navbar from './Navbar'; // Import the Navbar component
 
 import './PathfindingVisualizer.css';
 
@@ -74,20 +76,17 @@ export default class PathfindingVisualizer extends Component {
   }
 
   render() {
-    const {grid, mouseIsPressed} = this.state;
+    const { grid, mouseIsPressed } = this.state;
 
     return (
-      <>
-        <button onClick={() => this.visualizeDijkstra()}>
-          Visualize Dijkstra's Algorithm
-        </button>
+      <div className="pathfinding-visualizer">
+        <Navbar visualizeDijkstra={() => this.visualizeDijkstra()} /> {/* Pass visualizeDijkstra function as prop */}
         <div className="grid">
-          {
-          grid.map((row, rowIdx) => {
+          {grid.map((row, rowIdx) => {
             return (
               <div key={rowIdx}>
                 {row.map((node, nodeIdx) => {
-                  const {row, col, isFinish, isStart, isWall} = node;
+                  const { row, col, isFinish, isStart, isWall } = node;
                   return (
                     <Node
                       key={nodeIdx}
@@ -97,18 +96,17 @@ export default class PathfindingVisualizer extends Component {
                       isWall={isWall}
                       mouseIsPressed={mouseIsPressed}
                       onMouseDown={(row, col) => this.handleMouseDown(row, col)}
-                      onMouseEnter={(row, col) =>
-                        this.handleMouseEnter(row, col)
-                      }
+                      onMouseEnter={(row, col) => this.handleMouseEnter(row, col)}
                       onMouseUp={() => this.handleMouseUp()}
-                      row={row}></Node>
+                      row={row}
+                    />
                   );
                 })}
               </div>
             );
           })}
         </div>
-      </>
+      </div>
     );
   }
 }
@@ -148,3 +146,4 @@ const getNewGridWithWallToggled = (grid, row, col) => {
   newGrid[row][col] = newNode;
   return newGrid;
 };
+
