@@ -1,5 +1,4 @@
-import React, {Component} from 'react';
-
+import React, { Component } from 'react';
 import './Node.css';
 
 export default class Node extends Component {
@@ -14,6 +13,7 @@ export default class Node extends Component {
       onMouseUp,
       row,
     } = this.props;
+
     const extraClassName = isFinish
       ? 'node-finish'
       : isStart
@@ -28,7 +28,9 @@ export default class Node extends Component {
         className={`node ${extraClassName}`}
         onMouseDown={() => onMouseDown(row, col)}
         onMouseEnter={() => onMouseEnter(row, col)}
-        onMouseUp={() => onMouseUp()}></div>
+        onMouseUp={() => onMouseUp()}
+      >
+      </div>
     );
   }
 }

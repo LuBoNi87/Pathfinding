@@ -1,16 +1,15 @@
 import React, {Component} from 'react';
 import Node from './Node/Node';
 import {dijkstra, getNodesInShortestPathOrder} from '../algorithms/dijkstra';
+import { astar, heuristic } from '../algorithms/astar';
 import './Navbar.css'; // Import the Navbar.css file for styling
 import Navbar from './Navbar'; // Import the Navbar component
-
 import './PathfindingVisualizer.css';
 
 const START_NODE_ROW = 10;
 const START_NODE_COL = 15;
 const FINISH_NODE_ROW = 10;
 const FINISH_NODE_COL = 35;
-
 export default class PathfindingVisualizer extends Component {
   constructor() {
     super();
@@ -19,27 +18,22 @@ export default class PathfindingVisualizer extends Component {
       mouseIsPressed: false,
     };
   }
-
   componentDidMount() {
     const grid = getInitialGrid();
     this.setState({grid});
   }
-
   handleMouseDown(row, col) {
     const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
     this.setState({grid: newGrid, mouseIsPressed: true});
   }
-
   handleMouseEnter(row, col) {
     if (!this.state.mouseIsPressed) return;
     const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
     this.setState({grid: newGrid});
   }
-
   handleMouseUp() {
     this.setState({mouseIsPressed: false});
   }
-
   animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder) {
     for (let i = 0; i <= visitedNodesInOrder.length; i++) {
       if (i === visitedNodesInOrder.length) {
@@ -55,7 +49,6 @@ export default class PathfindingVisualizer extends Component {
       }, 10 * i);
     }
   }
-
   animateShortestPath(nodesInShortestPathOrder) {
     for (let i = 0; i < nodesInShortestPathOrder.length; i++) {
       setTimeout(() => {
@@ -64,23 +57,40 @@ export default class PathfindingVisualizer extends Component {
           'node node-shortest-path';
       }, 50 * i);
     }
-  }
-
+}
   visualizeDijkstra() {
-    const {grid} = this.state;
+    let {grid} = this.state;
     const startNode = grid[START_NODE_ROW][START_NODE_COL];
     const finishNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];
     const visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
     const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
     this.animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder);
   }
-
+  visualizeAStar() {
+    let { grid } = this.state;
+    const startNode = grid[START_NODE_ROW][START_NODE_COL];
+    const finishNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];
+    const nodesInShortestPathOrder = astar(grid, startNode, finishNode); // Apelarea algoritmului A*
+    this.animateAStar(nodesInShortestPathOrder);
+  }
+  animateAStar(nodesInShortestPathOrder) {
+    for (let i = 0; i < nodesInShortestPathOrder.length; i++) {
+      setTimeout(() => {
+        const node = nodesInShortestPathOrder[i];
+        document.getElementById(`node-${node.row}-${node.col}`).className =
+          'node node-shortest-path';
+      }, 50 * i);
+    }
+  }
   render() {
     const { grid, mouseIsPressed } = this.state;
-
     return (
       <div className="pathfinding-visualizer">
-        <Navbar visualizeDijkstra={() => this.visualizeDijkstra()} /> {/* Pass visualizeDijkstra function as prop */}
+        {/* Transmite functia visualizeDijkstra ca proprietate */}
+        <Navbar visualizeDijkstra={() => this.visualizeDijkstra()} 
+          visualizeAStar={() => this.visualizeAStar()}
+          />
+          <div className='grid-container'>
         <div className="grid">
           {grid.map((row, rowIdx) => {
             return (
@@ -91,14 +101,16 @@ export default class PathfindingVisualizer extends Component {
                     <Node
                       key={nodeIdx}
                       col={col}
-                      isFinish={isFinish}
+                      row={row}
                       isStart={isStart}
+                      isFinish={isFinish}
                       isWall={isWall}
                       mouseIsPressed={mouseIsPressed}
                       onMouseDown={(row, col) => this.handleMouseDown(row, col)}
                       onMouseEnter={(row, col) => this.handleMouseEnter(row, col)}
                       onMouseUp={() => this.handleMouseUp()}
-                      row={row}
+                      gCost={node.gCost}
+                      hCost={heuristic(node, node.isFinish)}
                     />
                   );
                 })}
@@ -106,11 +118,11 @@ export default class PathfindingVisualizer extends Component {
             );
           })}
         </div>
+        </div>
       </div>
     );
   }
 }
-
 const getInitialGrid = () => {
   const grid = [];
   for (let row = 0; row < 20; row++) {
@@ -122,7 +134,6 @@ const getInitialGrid = () => {
   }
   return grid;
 };
-
 const createNode = (col, row) => {
   return {
     col,
@@ -135,9 +146,8 @@ const createNode = (col, row) => {
     previousNode: null,
   };
 };
-
 const getNewGridWithWallToggled = (grid, row, col) => {
-  const newGrid = grid.slice();
+  const newGrid = grid.slice()
   const node = newGrid[row][col];
   const newNode = {
     ...node,
