@@ -59,6 +59,7 @@ export default class PathfindingVisualizer extends Component {
     }
 }
   visualizeDijkstra() {
+    this.clearPath();
     let {grid} = this.state;
     const startNode = grid[START_NODE_ROW][START_NODE_COL];
     const finishNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];
@@ -67,21 +68,76 @@ export default class PathfindingVisualizer extends Component {
     this.animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder);
   }
   visualizeAStar() {
+    this.clearPath();
     let { grid } = this.state;
     const startNode = grid[START_NODE_ROW][START_NODE_COL];
     const finishNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];
-    const nodesInShortestPathOrder = astar(grid, startNode, finishNode); // Apelarea algoritmului A*
-    this.animateAStar(nodesInShortestPathOrder);
+    const { visitedNodesInOrder, nodesInShortestPathOrder } = astar(grid, startNode, finishNode); // Apelarea algoritmului A*
+    this.animateAStar(visitedNodesInOrder, nodesInShortestPathOrder);
   }
-  animateAStar(nodesInShortestPathOrder) {
-    for (let i = 0; i < nodesInShortestPathOrder.length; i++) {
+
+  animateAStar(visitedNodesInOrder, nodesInShortestPathOrder) {
+    for (let i = 0; i <= visitedNodesInOrder.length; i++) {
+      if (i === visitedNodesInOrder.length) {
+        setTimeout(() => {
+          this.animateShortestPath(nodesInShortestPathOrder);
+        }, 10 * i);
+        return;
+      }
       setTimeout(() => {
-        const node = nodesInShortestPathOrder[i];
+        const node = visitedNodesInOrder[i];
         document.getElementById(`node-${node.row}-${node.col}`).className =
-          'node node-shortest-path';
-      }, 50 * i);
+          'node node-visited';
+      }, 10 * i);
     }
   }
+
+  resetGrid() {
+    const newGrid = this.state.grid.map((row) =>
+      row.map((node) => {
+        const newNode = {
+          ...node,
+          distance: Infinity,
+          isVisited: false,
+          isWall: false,
+          previousNode: null,
+        };
+        if (!newNode.isStart && !newNode.isFinish) {
+          document.getElementById(`node-${node.row}-${node.col}`).className = 'node';
+        } else if (newNode.isStart) {
+          document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-start';
+        } else if (newNode.isFinish) {
+          document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-finish';
+        }
+        return newNode;
+      })
+    );
+    this.setState({ grid: newGrid });
+  }
+
+  clearPath() {
+    const newGrid = this.state.grid.slice();
+    for (const row of newGrid) {
+      for (const node of row) {
+        const newNode = {
+          ...node,
+          isVisited: false,
+          distance: Infinity,
+          previousNode: null,
+        };
+        if (node.isStart) {
+          document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-start';
+        } else if (node.isFinish) {
+          document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-finish';
+        } else if (!node.isWall) {
+          document.getElementById(`node-${node.row}-${node.col}`).className = 'node';
+        }
+        row[node.col] = newNode;
+      }
+    }
+    this.setState({ grid: newGrid });
+  }
+
   render() {
     const { grid, mouseIsPressed } = this.state;
     return (
@@ -89,6 +145,8 @@ export default class PathfindingVisualizer extends Component {
         {/* Transmite functia visualizeDijkstra ca proprietate */}
         <Navbar visualizeDijkstra={() => this.visualizeDijkstra()} 
           visualizeAStar={() => this.visualizeAStar()}
+          resetGrid={() => this.resetGrid()}
+          clearPath={() => this.clearPath()}
           />
           <div className='grid-container'>
         <div className="grid">
