@@ -5,7 +5,7 @@ const Navbar = ({ visualizeDijkstra, visualizeAStar, resetGrid, clearPath }) => 
   return (
     <nav className="navbar">
       <div className="navbar-brand">
-        <a href="YOUR_URL_HERE" className="navbar-link">Pathfinding Visualizer</a>
+        <a href="https://luboni87.github.io/Pathfinding/" className="navbar-link">Pathfinding Visualizer</a>
       </div>
       <div className="navbar-center">
         <button

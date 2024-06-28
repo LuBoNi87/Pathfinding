@@ -2,6 +2,19 @@ import React, { Component } from 'react';
 import './Node.css';
 
 export default class Node extends Component {
+
+  handleMouseDown = () => {
+    this.props.onMouseDown(this.props.row, this.props.col);
+  };
+
+  handleMouseEnter = () => {
+    this.props.onMouseEnter(this.props.row, this.props.col);
+  };
+
+  handleMouseUp = () => {
+    this.props.onMouseUp();
+  };
+
   render() {
     const {
       col,

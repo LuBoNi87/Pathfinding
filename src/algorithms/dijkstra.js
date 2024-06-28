@@ -10,7 +10,7 @@ export function dijkstra(grid, startNode, finishNode) {
     const closestNode = unvisitedNodes.shift();
     // daca intersectam un perete, sarim peste
     if (closestNode.isWall) continue;
-    // daca cel mai apropiat nod se afla la distana infinity
+    // daca cel mai apropiat nod se afla la distana infinit
     // inseamna ca suntem blocati deci trebuie sa ne oprim
     if (closestNode.distance === Infinity) return visitedNodesInOrder;
     closestNode.isVisited = true;
